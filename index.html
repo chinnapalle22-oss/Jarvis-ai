@@ -142,6 +142,20 @@ button:active {
 @keyframes pulse {
   50% { transform: scale(1.15); }
   }
+  .reactor.active .core {
+  box-shadow: 0 0 40px #00eaff,
+              0 0 80px #008cff,
+              0 0 120px #00eaff;
+  transform: scale(1.2);
+}
+
+.reactor.active .ring {
+  animation-duration: 1s;
+}
+
+.reactor.active {
+  filter: brightness(1.8);
+}
 </style>
 </head>
 
@@ -244,6 +258,7 @@ function startVoice() {
 
   recognition.onstart = function() {
     document.getElementById("status").innerText = "LISTENING...";
+    document.querySelector(".reactor").classList.add("active")
   };
 
   recognition.onresult = function(event) {
@@ -259,7 +274,7 @@ function startVoice() {
       "VOICE ERROR: " + event.error;
   };
 
-  recognition.onend = function() {
+  recognition.onend = function(document.querySelector(".reactor").classList.remove("active")) {
     if (document.getElementById("status").innerText === "LISTENING...") {
       document.getElementById("status").innerText = "ONLINE";
     }
