@@ -257,8 +257,9 @@ function startVoice() {
   recognition.interimResults = false;
 
   recognition.onstart = function() {
-    document.getElementById("status").innerText = "JARVIS LISTENING...";
-    document.querySelector(".reactor").classList.add("active")
+  document.getElementById("status").innerText = "JARVIS LISTENING...";
+  document.querySelector(".reactor").classList.add("active");
+};
   };
 
   recognition.onresult = function(event) {
@@ -274,10 +275,10 @@ function startVoice() {
       "VOICE ERROR: " + event.error;
   };
 
-  recognition.onend = function(document.querySelector(".reactor").classList.remove("active")) {
-    if (document.getElementById("status").innerText === "LISTENING...") {
-      document.getElementById("status").innerText = "ONLINE";
-      console.log("JARVIS REACTOR ACTIVATED");
+  recognition.onend = function() {
+  document.querySelector(".reactor").classList.remove("active");
+  document.getElementById("status").innerText = "ONLINE";
+};
     }
   };
 
