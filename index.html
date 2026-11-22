@@ -277,6 +277,7 @@ function startVoice() {
   recognition.onend = function(document.querySelector(".reactor").classList.remove("active")) {
     if (document.getElementById("status").innerText === "LISTENING...") {
       document.getElementById("status").innerText = "ONLINE";
+      console.log("JARVIS REACTOR ACTIVATED");
     }
   };
 
