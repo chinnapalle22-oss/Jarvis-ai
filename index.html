@@ -240,13 +240,12 @@ async function askJarvis() {
 }
 
 function startVoice() {
-
   const Recognition =
     window.SpeechRecognition ||
     window.webkitSpeechRecognition;
 
   if (!Recognition) {
-    alert("Speech recognition is not supported.");
+    alert("Speech recognition not supported");
     return;
   }
 
@@ -257,13 +256,14 @@ function startVoice() {
   recognition.interimResults = false;
 
   recognition.onstart = function() {
-  document.getElementById("status").innerText = "JARVIS LISTENING...";
-  document.querySelector(".reactor").classList.add("active");
-};
+    document.getElementById("status").innerText =
+      "JARVIS LISTENING...";
+
+    document.querySelector(".reactor").classList.add("active");
   };
 
   recognition.onresult = function(event) {
-    let text = event.results[0][0].transcript;
+    const text = event.results[0][0].transcript;
 
     document.getElementById("question").value = text;
 
@@ -276,13 +276,11 @@ function startVoice() {
   };
 
   recognition.onend = function() {
-  document.querySelector(".reactor").classList.remove("active");
-  document.getElementById("status").innerText = "ONLINE";
-};
-    }
+    document.querySelector(".reactor").classList.remove("active");
   };
 
   recognition.start();
+  }
 }
 
 </script>
