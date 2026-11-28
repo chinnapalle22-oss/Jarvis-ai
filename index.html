@@ -283,6 +283,145 @@ function startVoice() {
 }
 
 </script>
+<!-- JARVIS AI VIDEO STUDIO --><style>
+#videoStudio {
+  background: #090909;
+  color: #fff;
+  padding: 20px;
+  margin: 20px 0;
+  border: 1px solid #ff3030;
+  border-radius: 15px;
+  font-family: Arial, sans-serif;
+}
+#videoStudio h2 {
+  color: #ff3030;
+  text-align: center;
+}
+.jarvis-card {
+  background: #181818;
+  padding: 15px;
+  margin: 12px 0;
+  border-radius: 12px;
+}
+.jarvis-card button {
+  background: #c90000;
+  color: white;
+  border: none;
+  padding: 12px;
+  margin-top: 10px;
+  border-radius: 8px;
+  width: 100%;
+}
+.jarvis-card input, .jarvis-card textarea {
+  width: 100%;
+  padding: 10px;
+  margin-top: 8px;
+  box-sizing: border-box;
+  border-radius: 6px;
+}
+#videoPreview {
+  width: 100%;
+  margin-top: 12px;
+  display: none;
+}
+</style><section id="videoStudio">
+  <h2>🤖 JARVIS VIDEO STUDIO</h2>
+  <p style="text-align:center;color:#aaa">
+    AI VIDEO CREATION & EDITING CENTER
+  </p>  <div class="jarvis-card">
+    <h3>🎬 Upload Your Video</h3>
+    <input type="file" id="jarvisVideo" accept="video/*">
+    <video id="videoPreview" controls></video>
+  </div>  <div class="jarvis-card">
+    <h3>✂️ Video Trimmer</h3>
+    <label>Start time (seconds)</label>
+    <input type="number" id="startTime" value="0" min="0">
+    <label>End time (seconds)</label>
+    <input type="number" id="endTime" value="30" min="1">
+    <button onclick="jarvisTrimPreview()">Preview Selected Section</button>
+  </div>  <div class="jarvis-card">
+    <h3>🎙️ AI Video Script</h3>
+    <textarea id="videoPrompt" rows="4"
+      placeholder="Describe the video you want JARVIS to create..."></textarea>
+    <button onclick="jarvisGenerateScript()">Generate Video Script</button>
+    <textarea id="generatedScript" rows="5"
+      placeholder="Your generated script will appear here"></textarea>
+  </div>  <div class="jarvis-card">
+    <h3>📱 YouTube Video Details</h3>
+    <input id="ytTitle" placeholder="YouTube video title">
+    <textarea id="ytDescription" rows="3"
+      placeholder="Video description"></textarea>
+    <button onclick="jarvisPrepareUpload()">Prepare YouTube Upload</button>
+    <p id="uploadStatus"></p>
+  </div>
+</section><script>
+let jarvisVideoURL = null;
 
+document.getElementById("jarvisVideo").addEventListener("change", function(e) {
+  const file = e.target.files[0];
+  if (!file) return;
+
+  if (jarvisVideoURL) URL.revokeObjectURL(jarvisVideoURL);
+  jarvisVideoURL = URL.createObjectURL(file);
+
+  const preview = document.getElementById("videoPreview");
+  preview.src = jarvisVideoURL;
+  preview.style.display = "block";
+});
+
+function jarvisTrimPreview() {
+  const video = document.getElementById("videoPreview");
+  const start = Number(document.getElementById("startTime").value);
+  const end = Number(document.getElementById("endTime").value);
+
+  if (!video.src || !video.duration) {
+    alert("Upload a video first.");
+    return;
+  }
+
+  if (start < 0 || end <= start || end > video.duration) {
+    alert("Enter valid start and end times.");
+    return;
+  }
+
+  video.currentTime = start;
+  video.play();
+
+  video.ontimeupdate = function() {
+    if (video.currentTime >= end) {
+      video.pause();
+      video.ontimeupdate = null;
+    }
+  };
+}
+
+function jarvisGenerateScript() {
+  const prompt = document.getElementById("videoPrompt").value.trim();
+
+  if (!prompt) {
+    alert("Enter a video idea first.");
+    return;
+  }
+
+  document.getElementById("generatedScript").value =
+    "VIDEO TITLE: " + prompt +
+    "\n\nINTRODUCTION:\nWelcome to our channel!\n\n" +
+    "MAIN CONTENT:\n" + prompt +
+    "\n\nCONCLUSION:\nLike, Share and Subscribe!";
+}
+
+function jarvisPrepareUpload() {
+  const title = document.getElementById("ytTitle").value.trim();
+  const description = document.getElementById("ytDescription").value.trim();
+
+  if (!title || !description) {
+    alert("Enter a title and description.");
+    return;
+  }
+
+  document.getElementById("uploadStatus").textContent =
+    "Video details prepared. YouTube API connection is required for uploading.";
+}
+</script>
 </body>
 </html>
