@@ -423,5 +423,250 @@ function jarvisPrepareUpload() {
     "Video details prepared. YouTube API connection is required for uploading.";
 }
 </script>
+  <!-- JARVIS ANIMATION ENGINE -->
+
+<style>
+#jarvisAnimation {
+  background:#080808;
+  color:white;
+  padding:20px;
+  margin:20px 0;
+  border:1px solid red;
+  border-radius:15px;
+  font-family:Arial;
+}
+
+#jarvisAnimation h2 {
+  color:#ff3030;
+  text-align:center;
+}
+
+#jarvisAnimation input,
+#jarvisAnimation select {
+  width:100%;
+  padding:12px;
+  margin:8px 0;
+  box-sizing:border-box;
+  border-radius:8px;
+}
+
+#jarvisAnimation button {
+  width:100%;
+  padding:13px;
+  margin:7px 0;
+  background:#d00000;
+  color:white;
+  border:0;
+  border-radius:8px;
+  font-weight:bold;
+}
+
+#jarvisCanvas {
+  width:100%;
+  background:black;
+  border:1px solid red;
+  border-radius:10px;
+  margin-top:12px;
+}
+</style>
+
+<section id="jarvisAnimation">
+
+<h2>🤖 JARVIS ANIMATION STUDIO</h2>
+
+<p>Create animated videos automatically.</p>
+
+<input id="jaTopic"
+placeholder="Enter animation topic">
+
+<select id="jaStyle">
+<option value="2d">2D Cartoon</option>
+<option value="3d">3D Style</option>
+<option value="cinematic">Cinematic</option>
+</select>
+
+<select id="jaDuration">
+<option value="15">15 Seconds</option>
+<option value="30">30 Seconds</option>
+<option value="60">1 Minute</option>
+</select>
+
+<button onclick="jaStart()">▶ CREATE ANIMATION</button>
+
+<canvas id="jarvisCanvas"
+width="1280" height="720"></canvas>
+
+<button onclick="jaDownload()">⬇ SAVE VIDEO TO MOBILE</button>
+
+<p id="jaStatus">JARVIS Animation Engine Ready.</p>
+
+</section>
+
+<script>
+let jaRecorder;
+let jaChunks=[];
+let jaAnimation=null;
+let jaRecording=false;
+let jaStream=null;
+let jaStarted=0;
+let jaLength=15;
+let jaTitle="JARVIS AI";
+let jaFrame=0;
+
+function jaStart(){
+
+ const topic=document.getElementById("jaTopic").value.trim();
+
+ if(!topic){
+  alert("Enter an animation topic first.");
+  return;
+ }
+
+ if(!window.MediaRecorder ||
+    !HTMLCanvasElement.prototype.captureStream){
+  alert("Video recording is not supported in this browser.");
+  return;
+ }
+
+ if(jaRecording){
+  alert("Animation is already running.");
+  return;
+ }
+
+ jaTitle=topic;
+ jaLength=Number(document.getElementById("jaDuration").value);
+ jaFrame=0;
+ jaStarted=performance.now();
+ jaChunks=[];
+
+ const canvas=document.getElementById("jarvisCanvas");
+ const ctx=canvas.getContext("2d");
+
+ const style=document.getElementById("jaStyle").value;
+
+ const stream=canvas.captureStream(30);
+ jaStream=stream;
+
+ let options={mimeType:"video/webm"};
+
+ if(!MediaRecorder.isTypeSupported(options.mimeType)){
+  options={};
+ }
+
+ jaRecorder=new MediaRecorder(stream,options);
+
+ jaRecorder.ondataavailable=function(e){
+  if(e.data.size>0) jaChunks.push(e.data);
+ };
+
+ jaRecorder.onstop=function(){
+
+  const blob=new Blob(jaChunks,{
+   type:jaRecorder.mimeType || "video/webm"
+  });
+
+  jaAnimation=URL.createObjectURL(blob);
+
+  document.getElementById("jaStatus").innerText=
+  "Animation completed! Video is ready to download.";
+
+  stream.getTracks().forEach(t=>t.stop());
+
+  jaRecording=false;
+ };
+
+ jaRecorder.start();
+ jaRecording=true;
+
+ document.getElementById("jaStatus").innerText=
+ "JARVIS is creating your animation...";
+
+ function draw(now){
+
+  if(!jaRecording) return;
+
+  const elapsed=(now-jaStarted)/1000;
+  const progress=Math.min(elapsed/jaLength,1);
+
+  ctx.fillStyle="#080b19";
+  ctx.fillRect(0,0,1280,720);
+
+  // Animated background
+  for(let i=0;i<35;i++){
+   let x=(i*97+now*0.025)%1280;
+   let y=(i*53)%720;
+
+   ctx.fillStyle="rgba(0,180,255,0.4)";
+   ctx.beginPath();
+   ctx.arc(x,y,3,0,Math.PI*2);
+   ctx.fill();
+  }
+
+  // Animation title
+  ctx.textAlign="center";
+  ctx.fillStyle="#ffffff";
+  ctx.font="bold 54px Arial";
+  ctx.fillText(jaTitle.substring(0,35),640,180);
+
+  // Animated glowing object
+  let x=640+Math.sin(now/600)*250;
+  let y=350+Math.cos(now/800)*70;
+
+  let gradient=ctx.createRadialGradient(
+   x,y,5,x,y,100
+  );
+
+  gradient.addColorStop(0,"#ffffff");
+  gradient.addColorStop(0.3,
+   style==="cinematic"?"#ff3030":"#00baff");
+  gradient.addColorStop(1,"transparent");
+
+  ctx.fillStyle=gradient;
+  ctx.beginPath();
+  ctx.arc(x,y,100,0,Math.PI*2);
+  ctx.fill();
+
+  // Animated subtitle
+  ctx.fillStyle="#ffffff";
+  ctx.font="30px Arial";
+  ctx.fillText(
+   "Welcome to the world of "+jaTitle.substring(0,30),
+   640,570
+  );
+
+  // Progress bar
+  ctx.fillStyle="#333";
+  ctx.fillRect(200,650,880,12);
+
+  ctx.fillStyle="#ff3030";
+  ctx.fillRect(200,650,880*progress,12);
+
+  jaFrame++;
+
+  if(elapsed>=jaLength){
+   jaRecording=false;
+   jaRecorder.stop();
+   return;
+  }
+
+  requestAnimationFrame(draw);
+ }
+
+ requestAnimationFrame(draw);
+}
+
+function jaDownload(){
+
+ if(!jaAnimation){
+  alert("Create an animation first.");
+  return;
+ }
+
+ const a=document.createElement("a");
+ a.href=jaAnimation;
+ a.download="JARVIS-Animation.webm";
+ a.click();
+}
+</script>
 </body>
 </html>
